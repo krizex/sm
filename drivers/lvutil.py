@@ -410,7 +410,7 @@ def createVG(root, vgname):
     rootdev = root.split(',')[0]
 
     # Create PVs for each device
-    for dev in root.split(','):
+    for dev in root.split(',')[1:]:
         if dev in [systemroot, '%s1' % systemroot, '%s2' % systemroot]:
             raise xs_errors.XenError('Rootdev', \
                   opterr=('Device %s contains core system files, ' \
@@ -448,7 +448,8 @@ def createVG(root, vgname):
 
     # Create VG on first device
     try:
-        cmd_lvm([CMD_VGCREATE, vgname, rootdev])
+        # option `--metadatasize` is necessary here because vgcreate need it when creating PV
+        cmd_lvm([CMD_VGCREATE, "--metadatasize", "10M", vgname, rootdev])
     except :
         raise xs_errors.XenError('LVMGroupCreate')
 
